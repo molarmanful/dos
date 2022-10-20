@@ -1,5 +1,6 @@
 #include "ANY.h"
 
+ANY::ANY() {}
 ANY::~ANY() {}
 String ANY::toString() { return ""; }
 String ANY::toForm() { return "UN"; }

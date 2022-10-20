@@ -5,6 +5,7 @@
 
 class ANY {
 public:
+  ANY();
   virtual ~ANY();
   virtual String toString();
   virtual String toForm();
