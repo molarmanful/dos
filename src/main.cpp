@@ -4,47 +4,52 @@
 class ANY {
 public:
   virtual ~ANY() {}
-  String toString() { return ""; }
+  virtual String toString() { return ""; }
+  virtual String toForm() { return "UN"; }
 };
 
 class STR : public ANY {
 public:
   String x;
   STR(String s) { x = s; }
-  String toString() { return x; }
+  String toString() override { return x; }
+  String toForm() override { return "STR(" + x + ")"; }
 };
 
 class CMD : public ANY {
 public:
   String x;
   CMD(String c) { x = c; }
-  String toString() { return x; }
+  String toString() override { return x; }
+  String toForm() override { return "CMD(" + x + ")"; }
 };
 
 class NUM : public ANY {
 public:
   double x;
   NUM(double n) { x = n; }
-  String toString() { return String(x); }
+  String toString() override { return String(x); }
+  String toForm() override { return "NUM(" + toString() + ")"; }
 };
 
 class Parser {
 
-  List<ANY> xs;
   enum Type { Un, Num, Str, Cmd, Esc, Dot };
   Type type;
   String word;
 
 public:
+  List<ANY *> xs;
+
   Parser() { type = Un; }
 
   void clean() {
     switch (type) {
     case Str:
-      xs.Add(STR(word));
+      xs.Add(new STR(word));
       break;
     case Esc:
-      xs.Add(STR(word + '\\'));
+      xs.Add(new STR(word + '\\'));
       break;
     case Cmd: {
       bool p = true;
@@ -57,25 +62,25 @@ public:
       }
       if (p) {
         for (auto c : word) {
-          xs.Add(CMD(String(c)));
+          xs.Add(new CMD(String(c)));
         }
       } else {
-        xs.Add(CMD(word));
+        xs.Add(new CMD(word));
       }
       break;
     }
     case Dot:
       if (word == ".")
-        xs.Add(CMD(word));
+        xs.Add(new CMD(word));
       else if (word.indexOf('.') > 0) {
-        xs.Add(CMD(word.substring(0, word.length() - 1)));
-        xs.Add(CMD("."));
+        xs.Add(new CMD(word.substring(0, word.length() - 1)));
+        xs.Add(new CMD("."));
       } else {
-        xs.Add(NUM(word.toDouble()));
+        xs.Add(new NUM(word.toDouble()));
       }
       break;
     case Num:
-      xs.Add(NUM(word.toDouble()));
+      xs.Add(new NUM(word.toDouble()));
       break;
     default:
       break;
@@ -122,7 +127,7 @@ public:
     word += c;
   }
 
-  List<ANY> parse(String cs) {
+  void parse(String cs) {
     for (auto c : cs) {
       if (type == Str || type == Esc)
         pstr(c);
@@ -138,17 +143,20 @@ public:
       else
         pcmd(c);
     }
-    return xs;
   }
 };
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("PARSED:");
+  Serial.print("PARSING: ");
   Parser p;
-  List<ANY> xs = p.parse("asdf 1 2.1 3 4+");
-  for (int i = 0; i < xs.Count(); i++) {
-    Serial.println(xs[i].toString());
+  String inp = "asdf \"test\" 1 2.1 3 4+";
+  Serial.println(inp);
+  p.parse(inp);
+  for (int i = 0; i < p.xs.Count(); i++) {
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.println(p.xs[i]->toForm());
   }
 }
 
