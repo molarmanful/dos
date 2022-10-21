@@ -1,10 +1,8 @@
 #ifndef _Parser_h
 #define _Parser_h
 
-#include <Arduino.h>
-
 #include "ANY.h"
-#include "ListLib.h"
+#include "deps.h"
 
 class Parser {
   enum Type { Un, Num, Str, Cmd, Esc, Dot };
@@ -19,7 +17,7 @@ class Parser {
   void pnum(char c);
   void pdot();
   void pcmd(char c);
-  void parse(String cs);
+  void parse(String &cs);
 };
 
 #endif

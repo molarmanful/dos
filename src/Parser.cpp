@@ -12,7 +12,7 @@ void Parser::clean() {
       break;
     case Cmd: {
       bool p = true;
-      String pars = "()[]{}";
+      String pars("()[]{}");
       for (auto c : word) {
         if (pars.indexOf(c) < 0) {
           p = false;
@@ -86,7 +86,7 @@ void Parser::pcmd(char c) {
   word += c;
 }
 
-void Parser::parse(String cs) {
+void Parser::parse(String &cs) {
   for (auto c : cs) {
     if (type == Str || type == Esc)
       pstr(c);
