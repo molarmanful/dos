@@ -4,45 +4,45 @@ Parser::Parser() { type = Un; }
 
 void Parser::clean() {
   switch (type) {
-  case Str:
-    xs.Add(new STR(word));
-    break;
-  case Esc:
-    xs.Add(new STR(word + '\\'));
-    break;
-  case Cmd: {
-    bool p = true;
-    String pars = "()[]{}";
-    for (auto c : word) {
-      if (pars.indexOf(c) < 0) {
-        p = false;
-        break;
-      }
-    }
-    if (p) {
+    case Str:
+      xs.Add(new STR(word));
+      break;
+    case Esc:
+      xs.Add(new STR(word + '\\'));
+      break;
+    case Cmd: {
+      bool p = true;
+      String pars = "()[]{}";
       for (auto c : word) {
-        xs.Add(new CMD(String(c)));
+        if (pars.indexOf(c) < 0) {
+          p = false;
+          break;
+        }
       }
-    } else {
-      xs.Add(new CMD(word));
+      if (p) {
+        for (auto c : word) {
+          xs.Add(new CMD(String(c)));
+        }
+      } else {
+        xs.Add(new CMD(word));
+      }
+      break;
     }
-    break;
-  }
-  case Dot:
-    if (word == ".")
-      xs.Add(new CMD(word));
-    else if (word.indexOf('.') > 0) {
-      xs.Add(new CMD(word.substring(0, word.length() - 1)));
-      xs.Add(new CMD("."));
-    } else {
+    case Dot:
+      if (word == ".")
+        xs.Add(new CMD(word));
+      else if (word.indexOf('.') > 0) {
+        xs.Add(new CMD(word.substring(0, word.length() - 1)));
+        xs.Add(new CMD("."));
+      } else {
+        xs.Add(new NUM(word.toDouble()));
+      }
+      break;
+    case Num:
       xs.Add(new NUM(word.toDouble()));
-    }
-    break;
-  case Num:
-    xs.Add(new NUM(word.toDouble()));
-    break;
-  default:
-    break;
+      break;
+    default:
+      break;
   }
   word = "";
   type = Un;
@@ -102,4 +102,5 @@ void Parser::parse(String cs) {
     else
       pcmd(c);
   }
+  clean();
 }

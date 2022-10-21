@@ -1,17 +1,17 @@
 #ifndef _Parser_h
 #define _Parser_h
 
-#include "ANY.h"
-#include "ListLib.h"
 #include <Arduino.h>
 
-class Parser {
+#include "ANY.h"
+#include "ListLib.h"
 
+class Parser {
   enum Type { Un, Num, Str, Cmd, Esc, Dot };
   Type type;
   String word;
 
-public:
+ public:
   List<ANY *> xs;
   Parser();
   void clean();
