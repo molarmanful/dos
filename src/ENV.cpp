@@ -112,21 +112,45 @@ void ENV::cmd(String& c) {
   } else if (c[0] == '#' && c.length() > 1)
     ;
   else {
-    if (c == "out")
+    if (c == "#")
+      ;
+    else if (c == "out")
       Serial.print(pop()->toString());
     else if (c == "outn")
       Serial.println(pop()->toString());
 
+    else if (c == "(") {
+      List<ANY*> res;
+      for (int lvl = 1;;) {
+        ANY* c = code[0];
+        code.RemoveFirst();
+        if(c->type() == "CMD"){
+          String c1(c->toString());
+        }
+        if (c->type() == "CMD" && c->toString().indexOf('(') > -1)
+          lvl++;
+        else if (c->type() == "CMD" && c->toString().indexOf(')') > -1)
+          lvl--;
+        if (lvl <= 0) {
+          cmd(c->toString());
+          break;
+        }
+        res.Add(c);
+      }
+    } else if (c == ")")
+      ;
+
     else if (c == "dup")
       push(get(-1));
-    // TODO: dups
+    else if (c == "dups")
+      ;
     else if (c == "over")
       push(get(-2));
 
     else if (c == "pop")
       pop();
     else if (c == "clr")
-      pop(-2);
+      stack.Clear();
     else if (c == "nip")
       pop(-2);
 

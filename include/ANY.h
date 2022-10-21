@@ -48,4 +48,15 @@ class NUM : public ANY {
   double toDouble() override;
 };
 
+class FN : public ANY {
+ public:
+  List<ANY *> x;
+
+  FN(List<ANY *>);
+
+  String type() override;
+  String toString() override;
+  String toForm() override;
+};
+
 #endif

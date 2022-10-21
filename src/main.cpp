@@ -23,7 +23,7 @@ Result readSD(char f[]) {
     Serial.println("fail");
     return {false};
   }
-  file.println("\"Hello, world!\" \\+ 1 2.1 3 4 + * -");
+  file.println("\"Hello, world!\" \\+ 1 2.1 3 4 swap + *");
   file.close();
   Serial.println("done");
   Serial.print("READ ");
@@ -42,13 +42,15 @@ Result readSD(char f[]) {
 
 void setup() {
   Serial.begin(9600);
-  // Result test = readSD("test.lin");
-  // if (!test.done) return;
-  String inp("\"Hello, world!\" \\+ 1 2.1 3 4 + * -");
+  while (!Serial)
+    ;
+  Result test = readSD("test.lin");
+  if (!test.done) return;
+  // String inp("\"Hello, world!\" \\+ 1 2.1 3 4 + * -");
   ENV env;
-  env.run(inp);
-  // String inp(test.data);
   // env.run(inp);
+  String inp(test.data);
+  env.run(inp);
   inp = "";
 }
 

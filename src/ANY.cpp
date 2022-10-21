@@ -38,3 +38,21 @@ String NUM::type() { return "NUM"; }
 String NUM::toString() { return String(x); }
 String NUM::toForm() { return toString(); }
 double NUM::toDouble() { return x; }
+
+// FN
+
+FN::FN(List<ANY*> f) { x = f; }
+
+String FN::type() { return "FN"; }
+void join(List<ANY*>& xs, String& s, String sep) {
+  for (int i = 0, l = xs.Count(); i < l; i++) {
+    s += xs[i]->toString();
+    if (i < l - 1) s += sep;
+  }
+}
+String FN::toString() {
+  String s;
+  join(x, s, " ");
+  return s;
+}
+String FN::toForm() { return "(" + toString() + ")"; }
