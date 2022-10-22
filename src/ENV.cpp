@@ -199,6 +199,9 @@ void ENV::cmd(String& c) {
     else if (c == "^")
       pow_();
 
+    else if (c == ".")
+      ;
+
     else
       Serial.println("ERR: fn not found");
   }

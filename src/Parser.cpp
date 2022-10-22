@@ -31,7 +31,7 @@ void Parser::clean() {
     case Dot:
       if (word == ".")
         xs.Add(new CMD(word));
-      else if (word.indexOf('.') > 0) {
+      else if (word.indexOf('.') == word.length() - 1) {
         xs.Add(new CMD(word.substring(0, word.length() - 1)));
         xs.Add(new CMD("."));
       } else {
@@ -71,7 +71,7 @@ void Parser::pnum(char c) {
 }
 
 void Parser::pdot() {
-  if (type == !Num) {
+  if (type != Num) {
     clean();
     type = Dot;
   }
