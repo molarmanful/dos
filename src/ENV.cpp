@@ -2,9 +2,9 @@
 
 ENV::ENV() {}
 
-void printList(List<ANY*>& xs) {
-  for (int i = 0; i < xs.Count(); i++) {
-    String ci = xs[i]->toForm();
+void printArray(UA<ANY*>& xs) {
+  for (auto& x : xs) {
+    String ci = x->toForm();
     ci += " ";
     Serial.print(ci);
     ci = "";
@@ -19,16 +19,16 @@ void ENV::run(String& s) {
   p.parse(s);
   code = p.xs;
   Serial.print("PARSED: ");
-  printList(code);
+  printArray(code);
   Serial.println("---");
   exec();
   Serial.println("---\nDONE");
 }
 
 void ENV::exec() {
-  if (!code.IsEmpty()) {
+  if (!code.isEmpty()) {
     ANY* c = code[0];
-    code.RemoveFirst();
+    code.erase(0);
     Serial.print("EXEC: ");
     Serial.println(c->toForm());
     if (c->type() == "CMD") {
@@ -38,43 +38,39 @@ void ENV::exec() {
     } else {
       push(c);
     }
-    printList(stack);
+    printArray(stack);
     exec();
   }
 }
 
-void ENV::push(ANY* x) { stack.Add(x); }
+void ENV::push(ANY* x) { stack.add(x); }
 
-void ENV::push(List<ANY*>& x) {
-  for (int i = 0; i < x.Count(); i++) push(x[i]);
+void ENV::push(UA<ANY*>& x) {
+  for (auto& a : x) push(a);
 }
 
-ANY* ENV::pop() {
-  ANY* x = stack[stack.Count() - 1];
-  stack.RemoveLast();
-  return x;
-}
-
-ANY* ENV::pop(int i) {
-  if (i < 0) return pop(stack.Count() + i);
+ANY* ENV::pop(int i = -1) {
+  if (i < 0) return pop(stack.length() + i);
   ANY* x = stack[i];
-  stack.Remove(i);
+  stack.erase(i);
   return x;
 }
 
 ANY* ENV::get(int i) {
-  if (i < 0) return get(stack.Count() + i);
+  if (i < 0) i += stack.length();
   return stack[i];
 }
 
 void ENV::ins(int i, ANY* x) {
-  if (i < 0) i += stack.Count();
-  stack.Insert(i, x);
+  int l = stack.length();
+  if (i < 0) i += l;
+  for (int j = l - 1; j >= i; j--) stack[j + 1] = stack[j];
+  stack[i] = x;
 }
 
 void ENV::eval() {
-  FN f = Util::toFN(pop());
-  code.InsertRange(0, f.x.ToArray(), f.x.Count());
+  ANY* xs = pop();
+  for (auto& x : Util::toFN(xs).x) code.add(x);
 }
 
 void ENV::over() { push(get(-2)); }
@@ -129,10 +125,10 @@ void ENV::cmd(String& c) {
       Serial.println(pop()->toString());
 
     else if (c == "(") {
-      List<ANY*> res;
-      for (int lvl = 1; !code.IsEmpty();) {
+      UA<ANY*> res;
+      for (int lvl = 1; !code.isEmpty();) {
         ANY* c = code[0];
-        code.RemoveFirst();
+        code.erase(0);
         if (c->type() == "CMD") {
           String c1 = c->toString();
           if (c1.indexOf('(') > -1)
@@ -147,7 +143,7 @@ void ENV::cmd(String& c) {
           }
           c1 = "";
         }
-        res.Add(c);
+        res.add(c);
       }
       push(new FN(res));
     } else if (c == ")")
@@ -156,14 +152,14 @@ void ENV::cmd(String& c) {
     else if (c == "dup")
       push(get(-1));
     else if (c == "dups")
-      ;
+      push(new ARR(stack));
     else if (c == "over")
       push(get(-2));
 
     else if (c == "pop")
       pop();
     else if (c == "clr")
-      stack.Clear();
+      stack.erase();
     else if (c == "nip")
       pop(-2);
 

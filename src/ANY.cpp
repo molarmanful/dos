@@ -1,10 +1,5 @@
 #include "ANY.h"
 
-template <typename T>
-void Ls<T>::listCopy(List<T>& x, List<T>& y) {
-  y.AddRange(x.ToArray(), x.Count());
-}
-
 // ANY
 
 ANY::ANY() {}
@@ -24,10 +19,7 @@ String ANY::toForm() { return type(); }
 
 double ANY::toDouble() { return 0; }
 
-List<ANY*> ANY::toList() {
-  List<ANY*> o;
-  return o;
-}
+UA<ANY*> ANY::toArray() { return UA<ANY*>(); }
 
 // STR
 
@@ -51,11 +43,11 @@ String STR::toForm() {
 
 double STR::toDouble() { return toString().toDouble(); }
 
-List<ANY*> STR::toList() {
-  List<ANY*> o;
-  for (auto c : x) {
+UA<ANY*> STR::toArray() {
+  UA<ANY*> o;
+  for (auto& c : x) {
     String c1(c);
-    o.Add(new STR(c1));
+    ADD(o, new STR(c1));
     c1 = "";
   }
   return o;
@@ -79,9 +71,9 @@ String CMD::toForm() { return toString(); }
 
 double CMD::toDouble() { return toString().toDouble(); }
 
-List<ANY*> CMD::toList() {
-  List<ANY*> o;
-  o.Add(this);
+UA<ANY*> CMD::toArray() {
+  UA<ANY*> o;
+  o[0] = this;
   return o;
 }
 
@@ -103,23 +95,25 @@ String NUM::toForm() { return toString(); }
 
 double NUM::toDouble() { return x; }
 
-List<ANY*> NUM::toList() {
-  List<ANY*> o;
-  o.Add(this);
+UA<ANY*> NUM::toArray() {
+  UA<ANY*> o;
+  o[0] = this;
   return o;
 }
 
 // FN
 
-void join(List<ANY*>& xs, String& s, String sep) {
-  int l = xs.Count();
-  for (int i = 0; i < l; i++) {
-    s += xs[i]->toForm();
+void join(UA<ANY*>& xs, String& s, String sep = " ") {
+  int l = xs.length();
+  int i = 0;
+  for (auto& x : xs) {
+    s += x->toForm();
     if (i < l - 1) s += sep;
+    i++;
   }
 }
 
-FN::FN(List<ANY*>& f) { Ls<ANY*>::listCopy(f, x); }
+FN::FN(UA<ANY*>& f) { x = UA<ANY*>(f); }
 
 String FN::type() {
   String o = "FN";
@@ -128,7 +122,7 @@ String FN::type() {
 
 String FN::toString() {
   String s;
-  join(x, s, " ");
+  join(x, s);
   return s;
 }
 
@@ -136,8 +130,29 @@ String FN::toForm() { return "(" + toString() + ")"; }
 
 double FN::toDouble() { return toString().toDouble(); }
 
-List<ANY*> FN::toList() {
-  List<ANY*> o;
-  Ls<ANY*>::listCopy(x, o);
+UA<ANY*> FN::toArray() { return x; }
+
+// ARR
+
+ARR::ARR(UA<ANY*>& f) { x = UA<ANY*>(f); }
+
+String ARR::type() {
+  String o = "ARR";
   return o;
 }
+
+String ARR::toString() {
+  String s;
+  for (auto& a : x) s += a->toString();
+  return s;
+}
+
+String ARR::toForm() {
+  String s;
+  join(x, s);
+  return "[" + s + "]";
+}
+
+double ARR::toDouble() { return toString().toDouble(); }
+
+UA<ANY*> ARR::toArray() { return x; }

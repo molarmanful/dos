@@ -3,12 +3,6 @@
 
 #include "deps.h"
 
-template <typename T>
-class Ls {
- public:
-  static void listCopy(List<T>&, List<T>&);
-};
-
 class ANY {
  public:
   ANY();
@@ -18,7 +12,7 @@ class ANY {
   virtual String toString();
   virtual String toForm();
   virtual double toDouble();
-  virtual List<ANY*> toList();
+  virtual UA<ANY *> toArray();
 };
 
 class STR : public ANY {
@@ -31,7 +25,7 @@ class STR : public ANY {
   String toString() override;
   String toForm() override;
   double toDouble() override;
-  List<ANY*> toList() override;
+  UA<ANY *> toArray() override;
 };
 
 class CMD : public ANY {
@@ -44,7 +38,7 @@ class CMD : public ANY {
   String toString() override;
   String toForm() override;
   double toDouble() override;
-  List<ANY*> toList() override;
+  UA<ANY *> toArray() override;
 };
 
 class NUM : public ANY {
@@ -57,20 +51,33 @@ class NUM : public ANY {
   String toString() override;
   String toForm() override;
   double toDouble() override;
-  List<ANY*> toList() override;
+  UA<ANY *> toArray() override;
 };
 
 class FN : public ANY {
  public:
-  List<ANY*> x;
+  UA<ANY *> x;
 
-  FN(List<ANY*>&);
+  FN(UA<ANY *> &);
 
   String type() override;
   String toString() override;
   String toForm() override;
   double toDouble() override;
-  List<ANY*> toList() override;
+  UA<ANY *> toArray() override;
+};
+
+class ARR : public ANY {
+ public:
+  UA<ANY *> x;
+
+  ARR(UA<ANY *> &);
+
+  String type() override;
+  String toString() override;
+  String toForm() override;
+  double toDouble() override;
+  UA<ANY *> toArray() override;
 };
 
 #endif

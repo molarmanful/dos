@@ -5,10 +5,10 @@ Parser::Parser() { type = Un; }
 void Parser::clean() {
   switch (type) {
     case Str:
-      xs.Add(new STR(word));
+      ADD(xs, new STR(word));
       break;
     case Esc:
-      xs.Add(new STR(word + '\\'));
+      ADD(xs, new STR(word + '\\'));
       break;
     case Cmd: {
       bool p = true;
@@ -21,25 +21,25 @@ void Parser::clean() {
       }
       if (p) {
         for (auto c : word) {
-          xs.Add(new CMD(String(c)));
+          ADD(xs, new CMD(String(c)));
         }
       } else {
-        xs.Add(new CMD(word));
+        ADD(xs, new CMD(word));
       }
       break;
     }
     case Dot:
       if (word == ".")
-        xs.Add(new CMD(word));
+        ADD(xs, new CMD(word));
       else if (word.indexOf('.') == word.length() - 1) {
-        xs.Add(new CMD(word.substring(0, word.length() - 1)));
-        xs.Add(new CMD("."));
+        ADD(xs, new CMD(word.substring(0, word.length() - 1)));
+        ADD(xs, new CMD("."));
       } else {
-        xs.Add(new NUM(word.toDouble()));
+        ADD(xs, new NUM(word.toDouble()));
       }
       break;
     case Num:
-      xs.Add(new NUM(word.toDouble()));
+      ADD(xs, new NUM(word.toDouble()));
       break;
     default:
       break;

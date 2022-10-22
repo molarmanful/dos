@@ -1,21 +1,22 @@
 #ifndef _ENV_h
 #define _ENV_h
 
-#include "util.h"
+#include "Util.h"
 
 class ENV {
  public:
-  List<ANY *> stack;
-  List<ANY *> code;
+  UA<ANY *> stack;
+  UA<ANY *> code;
+  // StackArray<HashMap<String, ANY *>> loc;
+  // StackArray<HashMap<String, ANY *>> glob;
 
   ENV();
 
   void run(String &);
   void exec();
   void push(ANY *);
-  void push(List<ANY *> &);
+  void push(UA<ANY *> &);
 
-  ANY *pop();
   ANY *pop(int);
   ANY *get(int);
   void ins(int, ANY *);

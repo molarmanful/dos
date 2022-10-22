@@ -9,7 +9,7 @@ class Parser {
   String word;
 
  public:
-  List<ANY *> xs;
+  UA<ANY *> xs;
   Parser();
   void clean();
   void pstr(char);

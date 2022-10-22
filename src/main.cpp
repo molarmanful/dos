@@ -1,5 +1,4 @@
 #include "ENV.h"
-#include "deps.h"
 
 struct Result {
   bool done;
@@ -47,7 +46,7 @@ void setup() {
     ;
   // Result test = readSD("test.lin");
   // if (!test.done) return;
-  String inp = "1 2 (3 4).#";
+  String inp = "1 2 (3 4)";
   // String inp = test.data;
   env.run(inp);
   inp = "";
