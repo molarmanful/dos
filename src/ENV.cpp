@@ -2,9 +2,9 @@
 
 ENV::ENV() {}
 
-void printArray(UA<ANY*>& xs) {
+void ENV::printArray(UA<ANY*>& xs) {
   for (auto& x : xs) {
-    String ci = x->toForm();
+    auto ci = x->toForm();
     ci += " ";
     Serial.print(ci);
     ci = "";
@@ -32,7 +32,7 @@ void ENV::exec() {
     Serial.print("EXEC: ");
     Serial.println(c->toForm());
     if (c->type() == "CMD") {
-      String c1 = c->toString();
+      auto c1 = c->toString();
       cmd(c1);
       c1 = "";
     } else {
@@ -51,14 +51,19 @@ void ENV::push(UA<ANY*>& x) {
 
 ANY* ENV::pop(int i = -1) {
   if (i < 0) return pop(stack.length() + i);
-  ANY* x = stack[i];
+  auto x = stack[i];
   stack.erase(i);
   return x;
 }
 
-ANY* ENV::get(int i) {
+ANY*& ENV::get(int i) {
   if (i < 0) i += stack.length();
   return stack[i];
+}
+
+void ENV::set(int i, ANY* x) {
+  if (i < 0) i += stack.length();
+  stack[i] = x;
 }
 
 void ENV::ins(int i, ANY* x) {
@@ -70,7 +75,7 @@ void ENV::ins(int i, ANY* x) {
 
 void ENV::eval() {
   ANY* xs = pop();
-  for (auto& x : Util::toFN(xs).x) code.add(x);
+  for (auto& x : Util::toFArray(xs)) code.add(x);
 }
 
 void ENV::over() { push(get(-2)); }
@@ -78,18 +83,24 @@ void ENV::swap() { push(pop(-2)); }
 void ENV::rot() { push(pop(-3)); }
 void ENV::rotu() { ins(-2, pop()); }
 
-void ENV::trunc_() { push(new NUM(trunc(pop()->toDouble()))); }
+void ENV::trunc_() {
+  auto& o = get(-1);
+  o = new NUM(trunc(o->toDouble()));
+}
 
-void ENV::neg() { push(new NUM(-pop()->toDouble())); }
+void ENV::neg() {
+  auto& o = get(-1);
+  o = new NUM(-o->toDouble());
+}
 void ENV::add() {
-  double y = pop()->toDouble();
-  double x = pop()->toDouble();
+  auto y = pop()->toDouble();
+  auto x = pop()->toDouble();
   push(new NUM(x + y));
 }
 void ENV::sub() { neg(), add(); }
 void ENV::mul() {
-  double y = pop()->toDouble();
-  double x = pop()->toDouble();
+  auto y = pop()->toDouble();
+  auto x = pop()->toDouble();
   push(new NUM(x * y));
 }
 void ENV::div() { push(new NUM(-1)), pow_(), mul(); }
@@ -104,21 +115,46 @@ void ENV::mod() {
   push(new NUM(((x % y) + y) % y));
 }
 void ENV::pow_() {
-  double y = pop()->toDouble();
-  double x = pop()->toDouble();
+  auto y = pop()->toDouble();
+  auto x = pop()->toDouble();
   push(new NUM(pow(x, y)));
 }
 
 void ENV::cmd(String& c) {
   if (c[0] == '\\' && c.length() > 1) {
-    String c1 = c;
+    auto c1 = c;
     c1.remove(0, 1);
     push(new CMD(c1));
-  } else if (c[0] == '#' && c.length() > 1)
-    ;
+  }
+
   else {
     if (c == "#")
       eval();
+
+    else if (c == "UN")
+      push(new ANY());
+
+    else if (c == ">N") {
+      auto& o = get(-1);
+      if (o->type() != "NUM") o = new NUM(o->toDouble());
+    } else if (c == ">S") {
+      auto& o = get(-1);
+      if (o->type() != "STR") o = new STR(o->toString());
+    } else if (c == ">F") {
+      auto& o = get(-1);
+      if (o->type() != "FN") {
+        auto o1 = Util::toFArray(o);
+        o = new FN(o1);
+      }
+    } else if (c == ">A") {
+      auto& o = get(-1);
+      if (o->type() != "ARR") {
+        auto o1 = o->toArray();
+        printArray(o1);
+        o = new ARR(o1);
+      }
+    }
+
     else if (c == "out")
       Serial.print(pop()->toString());
     else if (c == "outn")
@@ -127,10 +163,10 @@ void ENV::cmd(String& c) {
     else if (c == "(") {
       UA<ANY*> res;
       for (int lvl = 1; !code.isEmpty();) {
-        ANY* c = code[0];
+        auto c = code[0];
         code.erase(0);
         if (c->type() == "CMD") {
-          String c1 = c->toString();
+          auto c1 = c->toString();
           if (c1.indexOf('(') > -1)
             lvl++;
           else if (c1.indexOf(')') > -1) {

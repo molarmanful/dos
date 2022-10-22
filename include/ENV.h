@@ -12,13 +12,16 @@ class ENV {
 
   ENV();
 
+  static void printArray(UA<ANY *> &);
+
   void run(String &);
   void exec();
   void push(ANY *);
   void push(UA<ANY *> &);
 
   ANY *pop(int);
-  ANY *get(int);
+  ANY *&get(int);
+  void set(int, ANY *);
   void ins(int, ANY *);
 
   void eval();

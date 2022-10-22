@@ -5,38 +5,29 @@
 ANY::ANY() {}
 ANY::~ANY() {}
 
-String ANY::type() {
-  String o = "UN";
-  return o;
-}
+String ANY::type() { return "UN"; }
 
-String ANY::toString() {
-  String o = "";
-  return o;
-}
+String ANY::toString() { return ""; }
 
 String ANY::toForm() { return type(); }
 
 double ANY::toDouble() { return 0; }
 
-UA<ANY*> ANY::toArray() { return UA<ANY*>(); }
+UA<ANY*> ANY::toArray() {
+  UA<ANY*> o;
+  return o;
+}
 
 // STR
 
 STR::STR(String s) { x = s; }
 
-String STR::type() {
-  String o = "STR";
-  return o;
-}
+String STR::type() { return "STR"; }
 
-String STR::toString() {
-  String o(x);
-  return o;
-}
+String STR::toString() { return x; }
 
 String STR::toForm() {
-  String x1 = x;
+  auto x1 = x;
   x1.replace("\"", "\\\"");
   return "\"" + x1 + "\"";
 }
@@ -45,11 +36,7 @@ double STR::toDouble() { return toString().toDouble(); }
 
 UA<ANY*> STR::toArray() {
   UA<ANY*> o;
-  for (auto& c : x) {
-    String c1(c);
-    ADD(o, new STR(c1));
-    c1 = "";
-  }
+  for (auto& c : x) ADD(o, new STR(String(c)));
   return o;
 }
 
@@ -57,15 +44,9 @@ UA<ANY*> STR::toArray() {
 
 CMD::CMD(String c) { x = c; }
 
-String CMD::type() {
-  String o = "CMD";
-  return o;
-}
+String CMD::type() { return "CMD"; }
 
-String CMD::toString() {
-  String o(x);
-  return o;
-}
+String CMD::toString() { return x; }
 
 String CMD::toForm() { return toString(); }
 
@@ -73,7 +54,7 @@ double CMD::toDouble() { return toString().toDouble(); }
 
 UA<ANY*> CMD::toArray() {
   UA<ANY*> o;
-  o[0] = this;
+  ADD(o, this);
   return o;
 }
 
@@ -81,15 +62,9 @@ UA<ANY*> CMD::toArray() {
 
 NUM::NUM(double n) { x = n; }
 
-String NUM::type() {
-  String o = "NUM";
-  return o;
-}
+String NUM::type() { return "NUM"; }
 
-String NUM::toString() {
-  String o(x);
-  return o;
-}
+String NUM::toString() { return String(x); }
 
 String NUM::toForm() { return toString(); }
 
@@ -97,7 +72,7 @@ double NUM::toDouble() { return x; }
 
 UA<ANY*> NUM::toArray() {
   UA<ANY*> o;
-  o[0] = this;
+  ADD(o, this);
   return o;
 }
 
@@ -113,12 +88,9 @@ void join(UA<ANY*>& xs, String& s, String sep = " ") {
   }
 }
 
-FN::FN(UA<ANY*>& f) { x = UA<ANY*>(f); }
+FN::FN(UA<ANY*> f) { x = f; }
 
-String FN::type() {
-  String o = "FN";
-  return o;
-}
+String FN::type() { return "FN"; }
 
 String FN::toString() {
   String s;
@@ -134,12 +106,9 @@ UA<ANY*> FN::toArray() { return x; }
 
 // ARR
 
-ARR::ARR(UA<ANY*>& f) { x = UA<ANY*>(f); }
+ARR::ARR(UA<ANY*> f) { x = f; }
 
-String ARR::type() {
-  String o = "ARR";
-  return o;
-}
+String ARR::type() { return "ARR"; }
 
 String ARR::toString() {
   String s;

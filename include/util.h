@@ -5,10 +5,7 @@
 
 class Util {
  public:
-  static STR toSTR(ANY *&);
-  static CMD toCMD(ANY *&);
-  static NUM toNUM(ANY *&);
-  static FN toFN(ANY *&);
+  static UA<ANY *> toFArray(ANY *&);
 };
 
 #endif
