@@ -3,6 +3,12 @@
 
 #include "deps.h"
 
+template <typename T>
+class Ls {
+ public:
+  static void listCopy(List<T>&, List<T>&);
+};
+
 class ANY {
  public:
   ANY();
@@ -12,51 +18,59 @@ class ANY {
   virtual String toString();
   virtual String toForm();
   virtual double toDouble();
+  virtual List<ANY*> toList();
 };
 
 class STR : public ANY {
  public:
   String x;
 
-  STR(String s);
+  STR(String);
 
   String type() override;
   String toString() override;
   String toForm() override;
+  double toDouble() override;
+  List<ANY*> toList() override;
 };
 
 class CMD : public ANY {
  public:
   String x;
 
-  CMD(String c);
+  CMD(String);
 
   String type() override;
   String toString() override;
   String toForm() override;
+  double toDouble() override;
+  List<ANY*> toList() override;
 };
 
 class NUM : public ANY {
  public:
   double x;
 
-  NUM(double n);
+  NUM(double);
 
   String type() override;
   String toString() override;
   String toForm() override;
   double toDouble() override;
+  List<ANY*> toList() override;
 };
 
 class FN : public ANY {
  public:
-  List<ANY *> x;
+  List<ANY*> x;
 
-  FN(List<ANY *>);
+  FN(List<ANY*>&);
 
   String type() override;
   String toString() override;
   String toForm() override;
+  double toDouble() override;
+  List<ANY*> toList() override;
 };
 
 #endif

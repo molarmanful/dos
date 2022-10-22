@@ -1,9 +1,7 @@
 #ifndef _ENV_h
 #define _ENV_h
 
-#include "ANY.h"
-#include "Parser.h"
-#include "deps.h"
+#include "util.h"
 
 class ENV {
  public:
@@ -12,13 +10,17 @@ class ENV {
 
   ENV();
 
-  void run(String &s);
+  void run(String &);
   void exec();
-  void push(ANY *x);
+  void push(ANY *);
+  void push(List<ANY *> &);
 
   ANY *pop();
-  ANY *pop(int i);
-  ANY *get(int i);
+  ANY *pop(int);
+  ANY *get(int);
+  void ins(int, ANY *);
+
+  void eval();
 
   void over();
   void swap();
@@ -34,7 +36,7 @@ class ENV {
   void mod();
   void pow_();
 
-  void cmd(String &c);
+  void cmd(String &);
 };
 
 #endif

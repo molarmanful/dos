@@ -2,7 +2,6 @@
 #define _Parser_h
 
 #include "ANY.h"
-#include "deps.h"
 
 class Parser {
   enum Type { Un, Num, Str, Cmd, Esc, Dot };
@@ -13,11 +12,11 @@ class Parser {
   List<ANY *> xs;
   Parser();
   void clean();
-  void pstr(char c);
-  void pnum(char c);
+  void pstr(char);
+  void pnum(char);
   void pdot();
-  void pcmd(char c);
-  void parse(String &cs);
+  void pcmd(char);
+  void parse(String &);
 };
 
 #endif
