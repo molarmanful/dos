@@ -1,13 +1,12 @@
 #include "ENV.h"
 
-ENV::ENV() {}
+ENV::ENV() { Un = new ANY(); }
+ENV::~ENV() {}
 
 void ENV::printArray(UA<ANY*>& xs) {
   for (auto& x : xs) {
-    auto ci = x->toForm();
-    ci += " ";
-    Serial.print(ci);
-    ci = "";
+    Serial.print(x->toForm());
+    Serial.print(" ");
   }
   Serial.println();
 }
@@ -15,67 +14,59 @@ void ENV::printArray(UA<ANY*>& xs) {
 void ENV::run(String& s) {
   Serial.print("START: ");
   Serial.println(s);
+
+  Stack<ANY*> st;
+  stack.push(st);
+  code.push(st);
+
+  Serial.print("PARSED: ");
   Parser p;
   p.parse(s);
-  code = p.xs;
-  Serial.print("PARSED: ");
-  printArray(code);
+  printArray(p.xs);
+
+  Serial.print("QUEUE: ");
+  gcode().pushRev(p.xs);
+  printArray(gcode().xs);
+
   Serial.println("---");
   exec();
   Serial.println("---\nDONE");
 }
 
 void ENV::exec() {
-  if (!code.isEmpty()) {
-    ANY* c = code[0];
-    code.erase(0);
+  while (!gcode().isEmpty()) {
+    ANY* c = gcode().pop();
     Serial.print("EXEC: ");
-    Serial.println(c->toForm());
+    printArray(gcode().xs);
     if (c->type() == "CMD") {
       auto c1 = c->toString();
       cmd(c1);
       c1 = "";
-    } else {
+    } else
       push(c);
-    }
-    printArray(stack);
-    exec();
+    printArray(gstack().xs);
   }
 }
 
-void ENV::push(ANY* x) { stack.add(x); }
+Stack<ANY*>& ENV::gstack() { return stack.get(-1); }
+Stack<ANY*>& ENV::gcode() { return code.get(-1); }
+UM<String, ANY*>& ENV::gloc() { return loc.get(-1); }
 
+void ENV::push(ANY* x) { gstack().push(x); }
 void ENV::push(UA<ANY*>& x) {
   for (auto& a : x) push(a);
 }
 
-ANY* ENV::pop(int i = -1) {
-  if (i < 0) return pop(stack.length() + i);
-  auto x = stack[i];
-  stack.erase(i);
-  return x;
-}
+ANY* ENV::pop(int i = -1) { return gstack().pop(i); }
 
-ANY*& ENV::get(int i) {
-  if (i < 0) i += stack.length();
-  return stack[i];
-}
+ANY*& ENV::get(int i) { return gstack().get(i); }
 
-void ENV::set(int i, ANY* x) {
-  if (i < 0) i += stack.length();
-  stack[i] = x;
-}
-
-void ENV::ins(int i, ANY* x) {
-  int l = stack.length();
-  if (i < 0) i += l;
-  for (int j = l - 1; j >= i; j--) stack[j + 1] = stack[j];
-  stack[i] = x;
-}
+void ENV::ins(int i, ANY* x) { gstack().ins(i, x); }
 
 void ENV::eval() {
-  ANY* xs = pop();
-  for (auto& x : Util::toFArray(xs)) code.add(x);
+  auto xs = pop();
+  auto fs = Util::toFArray(xs);
+  gcode().pushRev(fs);
 }
 
 void ENV::over() { push(get(-2)); }
@@ -132,22 +123,22 @@ void ENV::cmd(String& c) {
       eval();
 
     else if (c == "UN")
-      push(new ANY());
+      push(Un);
 
     else if (c == ">N") {
-      auto& o = get(-1);
+      auto o = get(-1);
       if (o->type() != "NUM") o = new NUM(o->toDouble());
     } else if (c == ">S") {
-      auto& o = get(-1);
+      auto o = get(-1);
       if (o->type() != "STR") o = new STR(o->toString());
     } else if (c == ">F") {
-      auto& o = get(-1);
+      auto o = get(-1);
       if (o->type() != "FN") {
         auto o1 = Util::toFArray(o);
         o = new FN(o1);
       }
     } else if (c == ">A") {
-      auto& o = get(-1);
+      auto o = get(-1);
       if (o->type() != "ARR") {
         auto o1 = o->toArray();
         printArray(o1);
@@ -162,9 +153,8 @@ void ENV::cmd(String& c) {
 
     else if (c == "(") {
       UA<ANY*> res;
-      for (int lvl = 1; !code.isEmpty();) {
-        auto c = code[0];
-        code.erase(0);
+      for (int lvl = 1; !gcode().isEmpty();) {
+        auto c = gcode().pop();
         if (c->type() == "CMD") {
           auto c1 = c->toString();
           if (c1.indexOf('(') > -1)
@@ -188,14 +178,14 @@ void ENV::cmd(String& c) {
     else if (c == "dup")
       push(get(-1));
     else if (c == "dups")
-      push(new ARR(stack));
+      push(new ARR(gstack().xs));
     else if (c == "over")
       push(get(-2));
 
     else if (c == "pop")
       pop();
     else if (c == "clr")
-      stack.erase();
+      gstack().clr();
     else if (c == "nip")
       pop(-2);
 

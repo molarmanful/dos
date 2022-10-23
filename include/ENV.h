@@ -4,21 +4,27 @@
 #include "Util.h"
 
 class ENV {
+  ANY *Un;
+
  public:
-  UA<ANY *> stack;
-  UA<ANY *> code;
-  UA<UM<String, ANY *>> loc;
-  UA<UM<String, ANY *>> glob;
+  Stack<Stack<ANY *>> stack;
+  Stack<Stack<ANY *>> code;
+  Stack<UM<String, ANY *>> loc;
+  UM<String, ANY *> glob;
 
   ENV();
+  ~ENV();
 
   static void printArray(UA<ANY *> &);
 
   void run(String &);
   void exec();
+
+  Stack<ANY *> &gstack();
+  Stack<ANY *> &gcode();
+  UM<String, ANY *> &gloc();
   void push(ANY *);
   void push(UA<ANY *> &);
-
   ANY *pop(int);
   ANY *&get(int);
   void set(int, ANY *);

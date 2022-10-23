@@ -5,7 +5,7 @@ struct Result {
   String data;
 };
 
-String inp = "1 2 (3 4) 5swap #";
+String inp = "1 2 (3 4) # 5";
 
 Result readSD(char f[]) {
   File file;
@@ -51,7 +51,6 @@ void setup() {
   // String x = test.data;
   // env.run(x);
   env.run(inp);
-  // inp = "";
 }
 
 void loop() {}

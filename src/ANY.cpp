@@ -1,5 +1,17 @@
 #include "ANY.h"
 
+// util
+
+void ANY::join(UA<ANY*>& xs, String& s, String sep = " ") {
+  int l = xs.length();
+  int i = 0;
+  for (auto& x : xs) {
+    s += x->toForm();
+    if (i < l - 1) s += sep;
+    i++;
+  }
+}
+
 // ANY
 
 ANY::ANY() {}
@@ -77,16 +89,6 @@ UA<ANY*> NUM::toArray() {
 }
 
 // FN
-
-void join(UA<ANY*>& xs, String& s, String sep = " ") {
-  int l = xs.length();
-  int i = 0;
-  for (auto& x : xs) {
-    s += x->toForm();
-    if (i < l - 1) s += sep;
-    i++;
-  }
-}
 
 FN::FN(UA<ANY*>& f) {
   int i = 0;

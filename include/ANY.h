@@ -1,12 +1,14 @@
 #ifndef _ANY_h
 #define _ANY_h
 
-#include "deps.h"
+#include "Stack.h"
 
 class ANY {
  public:
   ANY();
   virtual ~ANY();
+
+  static void join(UA<ANY *> &, String &, String);
 
   virtual String type();
   virtual String toString();
