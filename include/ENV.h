@@ -9,7 +9,7 @@ class ENV {
  public:
   Stack<Stack<ANY *>> stacks;
   Stack<Stack<ANY *>> codes;
-  Stack<UM<String, ANY *>> loc;
+  Stack<UM<String, ANY *>> locs;
   UM<String, ANY *> glob;
 
   ENV();

@@ -4,39 +4,37 @@ ENV::ENV() { Un = new ANY(); }
 ENV::~ENV() {}
 
 void ENV::printArray(UA<ANY*>& xs) {
-  for (auto& x : xs) {
-    Serial.print(x->toForm());
-    Serial.print(" ");
-  }
-  Serial.println();
+  for (auto& x : xs) SPR(x->toForm()), SPR(" ");
+  SPN();
 }
 
 void ENV::run(String& s) {
-  Serial.print("START: ");
-  Serial.println(s);
+  SPR("START: ");
+  SPN(s);
+
+  SPR("PARSED: ");
+  Parser p;
+  p.parse(s);
+  printArray(p.xs);
 
   Stack<ANY*> st1(Un);
   stacks.push(st1);
   Stack<ANY*> st2(Un);
   codes.push(st2);
+  UM<String, ANY*> m1;
+  m1.setInvalidValue(Un);
+  locs.push(m1);
 
-  Serial.print("PARSED: ");
-  Parser p;
-  p.parse(s);
-  printArray(p.xs);
-
-  Serial.print("QUEUE: ");
   gcode().pushRev(p.xs);
-  printArray(gcode().xs);
 
-  Serial.println("---");
+  SPN("---\n");
   exec();
-  Serial.println("---\nDONE");
+  SPN("---\nDONE");
 }
 
 void ENV::exec() {
   while (!gcode().isEmpty()) {
-    Serial.print("QUEUE: ");
+    SPR("QUEUE: ");
     printArray(gcode().xs);
     ANY* c = gcode().pop();
     if (c->type() == "CMD") {
@@ -46,12 +44,13 @@ void ENV::exec() {
     } else
       push(c);
     printArray(gstack().xs);
+    SPN();
   }
 }
 
 Stack<ANY*>& ENV::gstack() { return stacks.get(-1); }
 Stack<ANY*>& ENV::gcode() { return codes.get(-1); }
-UM<String, ANY*>& ENV::gloc() { return loc.get(-1); }
+UM<String, ANY*>& ENV::gloc() { return locs.get(-1); }
 
 void ENV::push(ANY* x) { gstack().push(x); }
 void ENV::push(UA<ANY*>& x) {
@@ -119,10 +118,22 @@ void ENV::cmd(String& c) {
     push(new FN(f));
   }
 
-  else if (c.startsWith("$$") && c.length() > 2)
-    push(glob[c.substring(2)]);
   else if (c.startsWith("=$$") && c.length() > 3)
     glob[c.substring(3)] = pop();
+  else if (c.startsWith("=$") && c.length() > 2)
+    gloc()[c.substring(2)] = pop();
+
+  else if (c.startsWith("$$") && c.length() > 2 && glob.find(c) > -1)
+    push(glob[c.substring(2)]);
+  else if (c[0] == '$' && c.length() > 1 && gloc().find(c) > -1)
+    push(gloc()[c.substring(1)]);
+  else if (c[0] == '$' && c.length() > 1 && glob.find(c) > -1)
+    push(glob[c.substring(1)]);
+
+  else if (gloc().find(c) > -1)
+    push(gloc()[c]), eval();
+  else if (glob.find(c) > -1)
+    push(glob[c]), eval();
 
   else if (c == "#")
     eval();
@@ -152,9 +163,9 @@ void ENV::cmd(String& c) {
   }
 
   else if (c == "out")
-    Serial.print(pop()->toString());
+    SPR(pop()->toString());
   else if (c == "outn")
-    Serial.println(pop()->toString());
+    SPN(pop()->toString());
 
   else if (c == "(") {
     UA<ANY*> res;
@@ -237,11 +248,7 @@ void ENV::cmd(String& c) {
   else if (c == ".")
     ;
 
-  else if (gloc().find(c) > -1)
-    ;
-  else if (glob.find(c) > -1)
-    ;
-
   else
-    Serial.println("ERR: fn not found");
+    // TODO: proper error handling
+    SPN("ERR: fn not found");
 }

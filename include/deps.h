@@ -10,6 +10,8 @@
 #include <ustd_functional.h>
 #include <ustd_map.h>
 
+#define SPR Serial.print
+#define SPN Serial.println
 #define UA ustd::array
 #define UM ustd::map
 #define ADD(xs, x) xs[xs.length()] = x

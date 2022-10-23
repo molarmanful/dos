@@ -5,39 +5,35 @@ struct Result {
   String data;
 };
 
-String inp = "dup";
+String inp = "1 2 \\+ =$$a a";
 
 Result readSD(char f[]) {
   File file;
-  Serial.print("INIT SD... ");
+  SPR("INIT SD... ");
   if (!SD.begin()) {
-    Serial.println("fail");
+    SPN("fail");
     return {false};
   }
-  Serial.println("done");
-  Serial.print("WRITE ");
-  Serial.print(f);
-  Serial.print("... ");
+  SPN("done");
+  SPR("WRITE "), SPR(f), SPR("... ");
   SD.remove(f);
   file = SD.open(f, FILE_WRITE);
   if (!file) {
-    Serial.println("fail");
+    SPN("fail");
     return {false};
   }
   file.println(inp);
   file.close();
-  Serial.println("done");
-  Serial.print("READ ");
-  Serial.print(f);
-  Serial.print("... ");
+  SPN("done");
+  SPR("READ "), SPR(f), SPR("... ");
   file = SD.open(f, FILE_READ);
   if (!file) {
-    Serial.println("fail");
+    SPN("fail");
     return {false};
   }
   String data = file.readString();
   file.close();
-  Serial.println("done");
+  SPN("done");
   return {true, data};
 }
 
