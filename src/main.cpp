@@ -5,7 +5,7 @@ struct Result {
   String data;
 };
 
-String inp = "1 2 [3 4]";
+String inp = "dup";
 
 Result readSD(char f[]) {
   File file;
