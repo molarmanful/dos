@@ -6,12 +6,12 @@
 #include <Arduino.h>
 #include <SD.h>
 #include <SPI.h>
-#include <StackArray.h>
 #include <ustd_array.h>
 #include <ustd_functional.h>
 #include <ustd_map.h>
 
 #define UA ustd::array
+#define UM ustd::map
 #define ADD(xs, x) xs[xs.length()] = x
 
 #endif

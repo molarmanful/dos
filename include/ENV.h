@@ -7,8 +7,8 @@ class ENV {
  public:
   UA<ANY *> stack;
   UA<ANY *> code;
-  // StackArray<HashMap<String, ANY *>> loc;
-  // StackArray<HashMap<String, ANY *>> glob;
+  UA<UM<String, ANY *>> loc;
+  UA<UM<String, ANY *>> glob;
 
   ENV();
 

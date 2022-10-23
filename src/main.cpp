@@ -5,6 +5,8 @@ struct Result {
   String data;
 };
 
+String inp = "1 2 (3 4) 5swap #";
+
 Result readSD(char f[]) {
   File file;
   Serial.print("INIT SD... ");
@@ -22,7 +24,7 @@ Result readSD(char f[]) {
     Serial.println("fail");
     return {false};
   }
-  file.println("\"Hello, world!\" (1 2 3 4) \\+ 1 2.1 3 4 swap + *");
+  file.println(inp);
   file.close();
   Serial.println("done");
   Serial.print("READ ");
@@ -46,10 +48,10 @@ void setup() {
     ;
   // Result test = readSD("test.lin");
   // if (!test.done) return;
-  String inp = "1 2 (3 4) 5swap #";
-  // String inp = test.data;
+  // String x = test.data;
+  // env.run(x);
   env.run(inp);
-  inp = "";
+  // inp = "";
 }
 
 void loop() {}
