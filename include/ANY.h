@@ -58,7 +58,7 @@ class FN : public ANY {
  public:
   UA<ANY *> x;
 
-  FN(UA<ANY *>);
+  FN(UA<ANY *> &);
 
   String type() override;
   String toString() override;
@@ -71,7 +71,7 @@ class ARR : public ANY {
  public:
   UA<ANY *> x;
 
-  ARR(UA<ANY *>);
+  ARR(UA<ANY *> &);
 
   String type() override;
   String toString() override;

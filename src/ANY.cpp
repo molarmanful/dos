@@ -88,7 +88,10 @@ void join(UA<ANY*>& xs, String& s, String sep = " ") {
   }
 }
 
-FN::FN(UA<ANY*> f) { x = f; }
+FN::FN(UA<ANY*>& f) {
+  int i = 0;
+  for (auto& a : f) x[i++] = a;
+}
 
 String FN::type() { return "FN"; }
 
@@ -106,7 +109,10 @@ UA<ANY*> FN::toArray() { return x; }
 
 // ARR
 
-ARR::ARR(UA<ANY*> f) { x = f; }
+ARR::ARR(UA<ANY*>& f) {
+  int i = 0;
+  for (auto& a : f) x[i++] = a;
+}
 
 String ARR::type() { return "ARR"; }
 

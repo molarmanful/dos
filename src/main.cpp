@@ -39,8 +39,6 @@ Result readSD(char f[]) {
   return {true, data};
 }
 
-UA<ANY*> test(UA<ANY*>& xs) { return xs; }
-
 ENV env;
 void setup() {
   Serial.begin(9600);
@@ -48,14 +46,10 @@ void setup() {
     ;
   // Result test = readSD("test.lin");
   // if (!test.done) return;
-  String inp = "1 2 \"asdf\" 1>A";
+  String inp = "1 2 (3 4) 5swap #";
   // String inp = test.data;
-  // env.run(inp);
+  env.run(inp);
   inp = "";
-  auto xs = NUM(10).toArray();
-  Serial.println(xs.length());
-  auto ys = test(xs);
-  ENV::printArray(ys);
 }
 
 void loop() {}
