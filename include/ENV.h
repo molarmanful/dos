@@ -7,8 +7,8 @@ class ENV {
   ANY *Un;
 
  public:
-  Stack<Stack<ANY *>> stack;
-  Stack<Stack<ANY *>> code;
+  Stack<Stack<ANY *>> stacks;
+  Stack<Stack<ANY *>> codes;
   Stack<UM<String, ANY *>> loc;
   UM<String, ANY *> glob;
 
@@ -23,6 +23,7 @@ class ENV {
   Stack<ANY *> &gstack();
   Stack<ANY *> &gcode();
   UM<String, ANY *> &gloc();
+
   void push(ANY *);
   void push(UA<ANY *> &);
   ANY *pop(int);

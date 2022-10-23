@@ -18,7 +18,7 @@ class Stack {
   }
 
   bool isEmpty() { return xs.isEmpty(); }
-  bool length() { return xs.length(); }
+  unsigned int length() { return xs.length(); }
 
   void setDef(T& x) { xs.setInvalidValue(x); }
 

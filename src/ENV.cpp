@@ -15,9 +15,10 @@ void ENV::run(String& s) {
   Serial.print("START: ");
   Serial.println(s);
 
-  Stack<ANY*> st;
-  stack.push(st);
-  code.push(st);
+  Stack<ANY*> st1;
+  stacks.push(st1);
+  Stack<ANY*> st2;
+  codes.push(st2);
 
   Serial.print("PARSED: ");
   Parser p;
@@ -35,9 +36,9 @@ void ENV::run(String& s) {
 
 void ENV::exec() {
   while (!gcode().isEmpty()) {
-    ANY* c = gcode().pop();
-    Serial.print("EXEC: ");
+    Serial.print("QUEUE: ");
     printArray(gcode().xs);
+    ANY* c = gcode().pop();
     if (c->type() == "CMD") {
       auto c1 = c->toString();
       cmd(c1);
@@ -48,8 +49,8 @@ void ENV::exec() {
   }
 }
 
-Stack<ANY*>& ENV::gstack() { return stack.get(-1); }
-Stack<ANY*>& ENV::gcode() { return code.get(-1); }
+Stack<ANY*>& ENV::gstack() { return stacks.get(-1); }
+Stack<ANY*>& ENV::gcode() { return codes.get(-1); }
 UM<String, ANY*>& ENV::gloc() { return loc.get(-1); }
 
 void ENV::push(ANY* x) { gstack().push(x); }
@@ -174,6 +175,14 @@ void ENV::cmd(String& c) {
       push(new FN(res));
     } else if (c == ")")
       ;
+    else if (c == "[") {
+      Stack<ANY*> st;
+      stacks.push(st);
+    } else if (c == "]" && stacks.length() > 1) {
+      auto o = stacks.pop().xs;
+      ANY* o1 = new ARR(o);
+      gstack().push(o1);
+    }
 
     else if (c == "dup")
       push(get(-1));
